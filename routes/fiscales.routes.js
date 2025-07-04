@@ -238,7 +238,7 @@ router.post('/AgregarFiscal/:idEscuela', async (req, res)=>{
     }
 })
 
-router.delete('/fiscales/:idFiscal', async (req, res) => {
+router.delete('/eliminarFiscal/:idFiscal', async (req, res) => {
     const idFiscal = parseInt(req.params.idFiscal);
 
     // Validación básica
