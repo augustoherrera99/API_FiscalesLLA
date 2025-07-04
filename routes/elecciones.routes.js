@@ -33,7 +33,7 @@ router.put('/ActualizarCantVotos/:idMesa', async (req, res)=>{
 
     }catch(error){
         console.error('Error al actualizar la cantidad de votos:', error);
-        res.status(500).json({ error: 'Error del servidor al actualizar la cantidad de votos.' });
+        res.status(500).json({ error: `Error del servidor al actualizar la cantidad de votos. Error: ${error.message}` });
     }
 })
 

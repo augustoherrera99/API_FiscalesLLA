@@ -26,7 +26,7 @@ router.get('/FiscalesSuplentes/:idEscuela', async (req, res)=>{
     }
     catch (error) {
         console.error('Error en la consulta FiscalesSuplentes:', error);
-        res.status(500).json({ error: 'Error del servidor al consultar fiscales suplentes' });
+        res.status(500).json({ error: `Error del servidor al consultar fiscales suplentes. Error: ${error.message}` });
     }
 })
 
@@ -85,7 +85,7 @@ router.put('/Asistencia/:idFiscal', async (req, res)=>{
 
     }catch(error){
         console.error('Error al marcar asistencia:', error);
-        res.status(500).json({ error: 'Error del servidor al marcar asistencia.' });
+        res.status(500).json({ error: `Error del servidor al marcar asistencia. Error: ${error.message}` });
     }
 })
 
@@ -159,7 +159,7 @@ router.put('/ActualizarFiscal/:idFiscal/:idUsuario', async (req, res) => {
 
     } catch (error) {
         console.error('Error al actualizar datos del fiscal:', error);
-        res.status(500).json({ error: 'Error del servidor al modificar datos del fiscal.' });
+        res.status(500).json({ error: `Error del servidor al modificar datos del fiscal. Error: ${error.message}` });
     }
 });
 
@@ -268,7 +268,7 @@ router.delete('/fiscales/:idFiscal', async (req, res) => {
         }
     } catch (error) {
         console.error('Error al eliminar fiscal:', error);
-        res.status(500).json({ error: 'Error del servidor al eliminar el fiscal.' });
+        res.status(500).json({ error: `Error del servidor al eliminar el fiscal. Error: ${error.message}` });
     }
 });
 
