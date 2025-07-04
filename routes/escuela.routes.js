@@ -91,7 +91,7 @@ router.get('/InfoEscuela/:idEscuela', async (req, res) => {
     res.status(200).json(data);
   } catch (error) {
     console.error('Error en la consulta InfoEscuela:', error);
-    res.status(500).json({ error: 'Error del servidor al consultar la escuela' });
+    res.status(500).json({ error: `Error del servidor al consultar la escuela. Error ${error.message}` });
   }
 });
 
@@ -117,7 +117,7 @@ router.put('/AbrirEscuela/:idEscuela', async (req, res)=>{
 
     }catch(error){
         console.error('Error al abrir la escuela:', error);
-        res.status(500).json({ error: 'Error del servidor al abrir escuela.' });
+        res.status(500).json({ error: `Error del servidor al abrir escuela. Error: ${error.message}` });
     }
 })
 

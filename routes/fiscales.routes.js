@@ -26,7 +26,7 @@ router.get('/FiscalesSuplentes/:idEscuela', async (req, res)=>{
     }
     catch (error) {
         console.error('Error en la consulta FiscalesSuplentes:', error);
-        res.status(500).json({ error: 'Error del servidor al consultar fiscales suplentes' });
+        res.status(500).json({ error: `Error del servidor al consultar fiscales suplentes. Error: ${error.message}` });
     }
 })
 
@@ -85,51 +85,52 @@ router.put('/Asistencia/:idFiscal', async (req, res)=>{
 
     }catch(error){
         console.error('Error al marcar asistencia:', error);
-        res.status(500).json({ error: 'Error del servidor al marcar asistencia.' });
+        res.status(500).json({ error: `Error del servidor al marcar asistencia. Error: ${error.message}` });
     }
 })
 
-router.put('/ActualizarFiscal/:idFiscal/:idUsuario', async (req, res) => {
+router.put('/ActualizarFiscal/:idFiscal', async (req, res) => {
+    //quite momentaneamente /:idUsuario
     const idFiscal = parseInt(req.params.idFiscal);
-    const idUsuario = parseInt(req.params.idUsuario);
+    //const idUsuario = parseInt(req.params.idUsuario);
     const body = req.body;
 
     if (isNaN(idFiscal)) {
         return res.status(400).json({ error: 'idFiscal inválido' });
     }
 
-    if (isNaN(idUsuario)) {
-        return res.status(400).json({ error: 'idUsuario inválido' });
-    }
+    // if (isNaN(idUsuario)) {
+    //     return res.status(400).json({ error: 'idUsuario inválido' });
+    // }
 
     try {
-        // Armado dinámico para tabla Usuario
-        const camposUsuario = ['apellido', 'nombre', 'telefono'];
-        const dataUsuario = {};
-        if (idUsuario) {
-            for (let campo of camposUsuario) {
-                if (body[campo]) {
-                    dataUsuario[campo] = body[campo];
-                }
-            }
-        }
+        // // Armado dinámico para tabla Usuario
+        // const camposUsuario = ['apellido', 'nombre', 'telefono'];
+        // const dataUsuario = {};
+        // if (idUsuario) {
+        //     for (let campo of camposUsuario) {
+        //         if (body[campo]) {
+        //             dataUsuario[campo] = body[campo];
+        //         }
+        //     }
+        // }
 
-        let result1 = { rowCount: 1 }; // Asumimos OK si no actualiza
-        if (Object.keys(dataUsuario).length > 0) {
-            const setClauses = Object.keys(dataUsuario).map((k, i) => `${k} = $${i + 1}`);
-            const values = Object.values(dataUsuario);
-            values.push(idUsuario); // último parámetro para WHERE
+        // let result1 = { rowCount: 1 }; // Asumimos OK si no actualiza
+        // if (Object.keys(dataUsuario).length > 0) {
+        //     const setClauses = Object.keys(dataUsuario).map((k, i) => `${k} = $${i + 1}`);
+        //     const values = Object.values(dataUsuario);
+        //     values.push(idUsuario); // último parámetro para WHERE
 
-            const sqlUsuario = `
-                UPDATE public."Usuario"
-                SET ${setClauses.join(', ')}
-                WHERE "idUsuario" = $${values.length};
-            `;
-            result1 = await query(sqlUsuario, values);
-        }
+        //     const sqlUsuario = `
+        //         UPDATE public."Usuario"
+        //         SET ${setClauses.join(', ')}
+        //         WHERE "idUsuario" = $${values.length};
+        //     `;
+        //     result1 = await query(sqlUsuario, values);
+        // }
 
         // Armado dinámico para tabla FiscalMesa
-        const camposFiscal = { suplente: 'suplente', dni: '"DNI"' };
+        const camposFiscal = { idMesa: '"idMesa"', suplente: 'suplente', dni: '"DNI"' };
         const dataFiscal = {};
         for (let campo in camposFiscal) {
             if (body[campo] !== undefined) {
@@ -146,12 +147,12 @@ router.put('/ActualizarFiscal/:idFiscal/:idUsuario', async (req, res) => {
             const sqlFiscal = `
                 UPDATE public."FiscalMesa"
                 SET ${setClauses.join(', ')}
-                WHERE "idFiscal" = $${values.length};
+                WHERE "idFiscalMesa" = $${values.length};
             `;
             result2 = await query(sqlFiscal, values);
         }
-
-        if (result1.rowCount > 0 && result2.rowCount > 0) {
+        // result1.rowCount > 0 &&
+        if ( result2.rowCount > 0) {
             res.status(200).json({ success: true, mensaje: 'Datos actualizados correctamente.' });
         } else {
             res.status(404).json({ success: false, mensaje: 'No se encontró el registro a actualizar.' });
@@ -159,7 +160,7 @@ router.put('/ActualizarFiscal/:idFiscal/:idUsuario', async (req, res) => {
 
     } catch (error) {
         console.error('Error al actualizar datos del fiscal:', error);
-        res.status(500).json({ error: 'Error del servidor al modificar datos del fiscal.' });
+        res.status(500).json({ error: `Error del servidor al modificar datos del fiscal. Error: ${error.message}` });
     }
 });
 
@@ -237,39 +238,40 @@ router.post('/AgregarFiscal/:idEscuela', async (req, res)=>{
     }
 })
 
-router.delete('/fiscales/:idFiscal', async (req, res) => {
+router.delete('/eliminarFiscal/:idFiscal', async (req, res) => {
     const idFiscal = parseInt(req.params.idFiscal);
 
-    // Validación básica
     if (isNaN(idFiscal)) {
         return res.status(400).json({ error: 'El ID del fiscal debe ser un número válido.' });
     }
 
     try {
-        const idUsuario = await query(
+        // Eliminamos el fiscal y recuperamos el idUsuario relacionado
+        const resultFiscal = await query(
             `DELETE FROM "FiscalMesa" WHERE "idFiscalMesa" = $1 RETURNING "idUsuario"`,
             [idFiscal]
         );
 
-        if (isNaN(idUsuario.rows[0].idUsuario)) {
-            const result = await query(
-                `DELETE FROM "Usuario" WHERE "idUsuario" = $1"`,
-                [idUsuario.rows[0].idUsuario]
-            );
-
-            if (result.rowCount > 0) {
-                res.status(200).json({ success: true, mensaje: 'Fiscal eliminado correctamente.' });
-            } else {
-                res.status(404).json({ success: false, mensaje: 'Fiscal no encontrado.' });
-            }
-        }
-        else {
+        // Si no encontró fiscal, avisamos
+        if (resultFiscal.rowCount === 0) {
             return res.status(404).json({ success: false, mensaje: 'Fiscal no encontrado.' });
         }
+
+        const idUsuario = resultFiscal.rows[0].idUsuario;
+
+        // Eliminamos el usuario relacionado (si existe)
+        const resultUsuario = await query(
+            `DELETE FROM "Usuario" WHERE "idUsuario" = $1`,
+            [idUsuario]
+        );
+
+        res.status(200).json({ success: true, mensaje: 'Fiscal y usuario eliminado correctamente.' });
+
     } catch (error) {
         console.error('Error al eliminar fiscal:', error);
-        res.status(500).json({ error: 'Error del servidor al eliminar el fiscal.' });
+        res.status(500).json({ error: `Error del servidor al eliminar el fiscal. Error: ${error.message}` });
     }
 });
+
 
 export default router

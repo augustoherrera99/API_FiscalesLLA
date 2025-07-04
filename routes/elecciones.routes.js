@@ -33,7 +33,7 @@ router.put('/ActualizarCantVotos/:idMesa', async (req, res)=>{
 
     }catch(error){
         console.error('Error al actualizar la cantidad de votos:', error);
-        res.status(500).json({ error: 'Error del servidor al actualizar la cantidad de votos.' });
+        res.status(500).json({ error: `Error del servidor al actualizar la cantidad de votos. Error: ${error.message}` });
     }
 })
 
@@ -55,7 +55,7 @@ router.post('/CargaActaEscrutinio/:idMesa', async (req, res)=>{
         await query(
         `INSERT INTO public."ActaEscrutinio"(
         "idMesa", "cantVotosLLA", "cantVotosUxP", "cantVotosHxNP", "cantVotosJxC", "votosNulos", "votosRecurridos", 
-        "votosBlancos", , "votosCGElectoral", "votosImpugnados", total, "mesaImpugnada")
+        "votosBlancos", "votosCGElectoral", "votosImpugnados", total, "mesaImpugnada")
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);`,
         [idMesa, votosLLA, votosUxP, votosHxNP, votosJxC, votosNulos, votosRecurridos, votosBlanco, votosCGElectoral, votosImpugnados, total, false]
         );
