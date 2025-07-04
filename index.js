@@ -15,13 +15,21 @@ const port = process.env.PORT || 3001;
 
 // Middlewares
 app.use(express.json());
-const allowedOrigins = [
-	"http://localhost:3000",
-	"http://192.168.1.105:3000",
-	"https://fiscalizacion2025.vercel.app",
-	"https://frontend-fiscales-lla-cba.vercel.app",
-];
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+
+app.use(
+	cors({
+		origin: true, 
+		credentials: true,
+	})
+);
+
+// const allowedOrigins = [
+// 	"http://localhost:3000",
+// 	"http://192.168.1.105:3000",
+// 	"https://fiscalizacion2025.vercel.app",
+// 	"https://frontend-fiscales-lla-cba.vercel.app",
+// ];
+// app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 // Rutas (solo paths relativos aquí)
 app.use("/elecciones", eleccionesRouter);
