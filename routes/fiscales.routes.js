@@ -89,47 +89,48 @@ router.put('/Asistencia/:idFiscal', async (req, res)=>{
     }
 })
 
-router.put('/ActualizarFiscal/:idFiscal/:idUsuario', async (req, res) => {
+router.put('/ActualizarFiscal/:idFiscal', async (req, res) => {
+    //quite momentaneamente /:idUsuario
     const idFiscal = parseInt(req.params.idFiscal);
-    const idUsuario = parseInt(req.params.idUsuario);
+    //const idUsuario = parseInt(req.params.idUsuario);
     const body = req.body;
 
     if (isNaN(idFiscal)) {
         return res.status(400).json({ error: 'idFiscal inválido' });
     }
 
-    if (isNaN(idUsuario)) {
-        return res.status(400).json({ error: 'idUsuario inválido' });
-    }
+    // if (isNaN(idUsuario)) {
+    //     return res.status(400).json({ error: 'idUsuario inválido' });
+    // }
 
     try {
-        // Armado dinámico para tabla Usuario
-        const camposUsuario = ['apellido', 'nombre', 'telefono'];
-        const dataUsuario = {};
-        if (idUsuario) {
-            for (let campo of camposUsuario) {
-                if (body[campo]) {
-                    dataUsuario[campo] = body[campo];
-                }
-            }
-        }
+        // // Armado dinámico para tabla Usuario
+        // const camposUsuario = ['apellido', 'nombre', 'telefono'];
+        // const dataUsuario = {};
+        // if (idUsuario) {
+        //     for (let campo of camposUsuario) {
+        //         if (body[campo]) {
+        //             dataUsuario[campo] = body[campo];
+        //         }
+        //     }
+        // }
 
-        let result1 = { rowCount: 1 }; // Asumimos OK si no actualiza
-        if (Object.keys(dataUsuario).length > 0) {
-            const setClauses = Object.keys(dataUsuario).map((k, i) => `${k} = $${i + 1}`);
-            const values = Object.values(dataUsuario);
-            values.push(idUsuario); // último parámetro para WHERE
+        // let result1 = { rowCount: 1 }; // Asumimos OK si no actualiza
+        // if (Object.keys(dataUsuario).length > 0) {
+        //     const setClauses = Object.keys(dataUsuario).map((k, i) => `${k} = $${i + 1}`);
+        //     const values = Object.values(dataUsuario);
+        //     values.push(idUsuario); // último parámetro para WHERE
 
-            const sqlUsuario = `
-                UPDATE public."Usuario"
-                SET ${setClauses.join(', ')}
-                WHERE "idUsuario" = $${values.length};
-            `;
-            result1 = await query(sqlUsuario, values);
-        }
+        //     const sqlUsuario = `
+        //         UPDATE public."Usuario"
+        //         SET ${setClauses.join(', ')}
+        //         WHERE "idUsuario" = $${values.length};
+        //     `;
+        //     result1 = await query(sqlUsuario, values);
+        // }
 
         // Armado dinámico para tabla FiscalMesa
-        const camposFiscal = { suplente: 'suplente', dni: '"DNI"' };
+        const camposFiscal = { idMesa: '"idMesa"', suplente: 'suplente', dni: '"DNI"' };
         const dataFiscal = {};
         for (let campo in camposFiscal) {
             if (body[campo] !== undefined) {
@@ -150,8 +151,8 @@ router.put('/ActualizarFiscal/:idFiscal/:idUsuario', async (req, res) => {
             `;
             result2 = await query(sqlFiscal, values);
         }
-
-        if (result1.rowCount > 0 && result2.rowCount > 0) {
+        // result1.rowCount > 0 &&
+        if ( result2.rowCount > 0) {
             res.status(200).json({ success: true, mensaje: 'Datos actualizados correctamente.' });
         } else {
             res.status(404).json({ success: false, mensaje: 'No se encontró el registro a actualizar.' });
