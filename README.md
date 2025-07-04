@@ -107,7 +107,7 @@ Actualiza dinámicamente los datos de un fiscal y su usuario.
 
 ## 🧾 Endpoint: Eliminar fiscal
 
-### `DELETE /api/fiscales/:idFiscal`
+### `DELETE /fiscales/:idFiscal`
 
 Elimina un fiscal del sistema según su ID.
 
