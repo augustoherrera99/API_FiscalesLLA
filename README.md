@@ -118,7 +118,7 @@ El flujo seria que el fiscal en donde presionas "cambiar fiscal" se intercambian
 
 ## 🧾 Endpoint: Eliminar fiscal
 
-### `DELETE /fiscales/:idFiscal`
+### `DELETE /eliminarFiscal/:idFiscal`
 
 Elimina un fiscal del sistema según su ID.
 
