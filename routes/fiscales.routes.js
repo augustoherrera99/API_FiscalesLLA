@@ -241,36 +241,37 @@ router.post('/AgregarFiscal/:idEscuela', async (req, res)=>{
 router.delete('/eliminarFiscal/:idFiscal', async (req, res) => {
     const idFiscal = parseInt(req.params.idFiscal);
 
-    // Validación básica
     if (isNaN(idFiscal)) {
         return res.status(400).json({ error: 'El ID del fiscal debe ser un número válido.' });
     }
 
     try {
-        const idUsuario = await query(
+        // Eliminamos el fiscal y recuperamos el idUsuario relacionado
+        const resultFiscal = await query(
             `DELETE FROM "FiscalMesa" WHERE "idFiscalMesa" = $1 RETURNING "idUsuario"`,
             [idFiscal]
         );
 
-        if (isNaN(idUsuario.rows[0].idUsuario)) {
-            const result = await query(
-                `DELETE FROM "Usuario" WHERE "idUsuario" = $1"`,
-                [idUsuario.rows[0].idUsuario]
-            );
-
-            if (result.rowCount > 0) {
-                res.status(200).json({ success: true, mensaje: 'Fiscal eliminado correctamente.' });
-            } else {
-                res.status(404).json({ success: false, mensaje: 'Fiscal no encontrado.' });
-            }
-        }
-        else {
+        // Si no encontró fiscal, avisamos
+        if (resultFiscal.rowCount === 0) {
             return res.status(404).json({ success: false, mensaje: 'Fiscal no encontrado.' });
         }
+
+        const idUsuario = resultFiscal.rows[0].idUsuario;
+
+        // Eliminamos el usuario relacionado (si existe)
+        const resultUsuario = await query(
+            `DELETE FROM "Usuario" WHERE "idUsuario" = $1`,
+            [idUsuario]
+        );
+
+        res.status(200).json({ success: true, mensaje: 'Fiscal y usuario eliminado correctamente.' });
+
     } catch (error) {
         console.error('Error al eliminar fiscal:', error);
         res.status(500).json({ error: `Error del servidor al eliminar el fiscal. Error: ${error.message}` });
     }
 });
+
 
 export default router
