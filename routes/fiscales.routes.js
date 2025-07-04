@@ -147,7 +147,7 @@ router.put('/ActualizarFiscal/:idFiscal', async (req, res) => {
             const sqlFiscal = `
                 UPDATE public."FiscalMesa"
                 SET ${setClauses.join(', ')}
-                WHERE "idFiscal" = $${values.length};
+                WHERE "idFiscalMesa" = $${values.length};
             `;
             result2 = await query(sqlFiscal, values);
         }
