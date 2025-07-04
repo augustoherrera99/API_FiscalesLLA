@@ -105,6 +105,41 @@ Actualiza dinámicamente los datos de un fiscal y su usuario.
 }
 ```
 
+## 🧾 Endpoint: Eliminar fiscal
+
+### `DELETE /api/fiscales/:idFiscal`
+
+Elimina un fiscal del sistema según su ID.
+
+### 🔧 Parámetros
+
+- **URL Param**:
+  - `idFiscal` (integer): ID del fiscal a eliminar.
+
+### 📥 Ejemplo de solicitud
+
+```http
+DELETE /api/fiscales/42
+```
+
+### 📤 Respuesta esperada (éxito)
+
+```json
+{
+  "message": "Fiscal eliminado correctamente"
+}
+```
+
+### ❌ Posibles errores
+
+- `404 Not Found`: si el `idFiscal` no existe
+- `500 Internal Server Error`: si ocurre un error en la base de datos
+
+### 🧪 Notas
+
+- El fiscal se elimina de la tabla `FiscalMesa`.
+- No se valida si ese fiscal está asociado a alguna mesa activa.
+
 ## ⚠️ Incidencias
 
 ### `POST /incidencias/AgregarIncidencia/:idCategoria`
